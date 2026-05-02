@@ -1,0 +1,13 @@
+ImplementationPlan.txt
+venv
+frontend/node_modules
+frontend/.next
+frontend/.env
+frontend/.gitignore
+frontend/AGENTS.md
+frontend/CLAUDE.md
+
+backend/.env
+backend/.gitignore
+backend/venv
+backend/__pycache__
