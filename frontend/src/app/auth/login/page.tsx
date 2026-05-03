@@ -40,15 +40,15 @@ export default function LoginPage() {
   return (
     <div className="glass rounded-2xl p-8 animate-fade-in-up delay-100">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+        <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
           Sign in
         </h2>
-        <p className="text-white/40 text-sm mt-1">Access your resume dashboard</p>
+        <p className="text-muted-foreground text-sm mt-1">Access your resume dashboard</p>
       </div>
 
       <form onSubmit={handleLogin} className="space-y-5">
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-white/60 text-xs uppercase tracking-widest font-mono">
+          <Label htmlFor="email" className="text-muted-foreground text-xs uppercase tracking-widest font-mono">
             Email
           </Label>
           <Input
@@ -58,16 +58,16 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/20 rounded-xl focus:border-cyan-500/50 transition-all"
+            className="h-12 bg-muted/30 border-border text-foreground placeholder:text-muted-foreground/50 rounded-xl focus:border-primary/50 transition-all"
           />
         </div>
 
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="password" className="text-white/60 text-xs uppercase tracking-widest font-mono">
+            <Label htmlFor="password" className="text-muted-foreground text-xs uppercase tracking-widest font-mono">
               Password
             </Label>
-            <button type="button" className="text-xs text-cyan-400/70 hover:text-cyan-400 transition-colors">
+            <button type="button" className="text-xs text-primary/70 hover:text-primary transition-colors">
               Forgot password?
             </button>
           </div>
@@ -78,12 +78,12 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="h-12 bg-white/5 border-white/10 text-white rounded-xl pr-12 focus:border-cyan-500/50 transition-all"
+              className="h-12 bg-muted/30 border-border text-foreground rounded-xl pr-12 focus:border-primary/50 transition-all"
             />
             <button
               type="button"
               onClick={() => setShowPw(!showPw)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground/30 hover:text-foreground/60 transition-colors"
             >
               {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
@@ -108,10 +108,10 @@ export default function LoginPage() {
         </div>
       </form>
 
-      <div className="mt-6 pt-6 border-t border-white/8 text-center">
-        <p className="text-sm text-white/30">
+      <div className="mt-6 pt-6 border-t border-border text-center">
+        <p className="text-sm text-muted-foreground">
           New here?{" "}
-          <Link href="/auth/register" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+          <Link href="/auth/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
             Create an account →
           </Link>
         </p>

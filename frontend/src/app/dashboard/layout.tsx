@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, FileText, Upload, Settings, LogOut, Menu, X, ChevronRight } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -30,32 +31,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   return (
-    <div className="flex h-screen w-full overflow-hidden" style={{ background: 'oklch(0.10 0.008 265)' }}>
+    <div className="flex h-screen w-full overflow-hidden bg-background">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex flex-col transition-transform duration-300 ease-in-out
-          md:relative md:translate-x-0 md:flex
+        className={`fixed inset-y-0 left-0 z-40 flex flex-col transition-transform duration-300 ease-in-out border-r
+          md:relative md:translate-x-0 md:flex bg-sidebar border-sidebar-border
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
         `}
-        style={{
-          width: '240px',
-          background: 'oklch(0.12 0.010 265)',
-          borderRight: '1px solid oklch(0.20 0.010 265)',
-        }}
+        style={{ width: '240px' }}
       >
         {/* Logo */}
-        <div className="flex items-center gap-3 px-5 h-16 border-b" style={{ borderColor: 'oklch(0.20 0.010 265)' }}>
+        <div className="flex items-center gap-3 px-5 h-16 border-b border-sidebar-border">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-            style={{ background: 'oklch(0.72 0.18 195 / 0.15)', border: '1px solid oklch(0.72 0.18 195 / 0.3)' }}
+            style={{ background: 'var(--primary-foreground)', border: '1px solid var(--border)' }}
           >
-            <FileText className="w-4 h-4" style={{ color: 'oklch(0.72 0.18 195)' }} />
+            <FileText className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-none" style={{ fontFamily: 'var(--font-display)' }}>
+            <p className="text-sm font-bold text-foreground leading-none" style={{ fontFamily: 'var(--font-display)' }}>
               Resume Intel
             </p>
-            <p className="text-[10px] mt-0.5" style={{ color: 'oklch(0.50 0.015 265)', fontFamily: 'var(--font-mono)' }}>
+            <p className="text-[10px] mt-0.5 text-muted-foreground" style={{ fontFamily: 'var(--font-mono)' }}>
               AI-powered
             </p>
           </div>
@@ -72,25 +69,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-150 group
                   ${active
-                    ? "bg-cyan-500/10 text-cyan-400 border-l-2 border-cyan-500 pl-[10px]"
+                    ? "nav-active"
                     : disabled
-                      ? "opacity-35 cursor-not-allowed text-white/40"
-                      : "text-white/50 hover:text-white hover:bg-white/5"
+                      ? "opacity-35 cursor-not-allowed text-muted-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
                   }`}
               >
-                <Icon className={`w-4 h-4 shrink-0 ${active ? "text-cyan-400" : ""}`} />
+                <Icon className={`w-4 h-4 shrink-0 ${active ? "text-primary" : ""}`} />
                 {label}
-                {active && <ChevronRight className="w-3 h-3 ml-auto text-cyan-400/60" />}
+                {active && <ChevronRight className="w-3 h-3 ml-auto text-primary/60" />}
               </Link>
             );
           })}
         </nav>
 
         {/* User section */}
-        <div className="px-3 py-4 border-t" style={{ borderColor: 'oklch(0.20 0.010 265)' }}>
+        <div className="px-3 py-4 border-t border-sidebar-border space-y-2">
+          <div className="flex items-center justify-between px-3 mb-2">
+            <span className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Appearance</span>
+            <ThemeToggle />
+          </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-white/40 hover:text-white hover:bg-white/5 transition-all"
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-all"
           >
             <LogOut className="w-4 h-4" />
             Sign out
@@ -101,8 +102,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 md:hidden"
-          style={{ background: 'oklch(0.05 0.008 265 / 0.7)' }}
+          className="fixed inset-0 z-30 md:hidden bg-black/60 backdrop-blur-sm"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -111,27 +111,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top bar (mobile) */}
         <header
-          className="flex items-center gap-4 px-5 h-16 border-b md:hidden"
-          style={{ background: 'oklch(0.12 0.010 265)', borderColor: 'oklch(0.20 0.010 265)' }}
+          className="flex items-center justify-between px-5 h-16 border-b md:hidden bg-sidebar border-sidebar-border"
         >
-          <button onClick={() => setSidebarOpen(true)} className="text-white/40 hover:text-white">
-            <Menu className="w-5 h-5" />
-          </button>
-          <span className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
-            Resume Intel
-          </span>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setSidebarOpen(true)} className="text-muted-foreground hover:text-foreground">
+              <Menu className="w-5 h-5" />
+            </button>
+            <span className="text-sm font-bold text-foreground" style={{ fontFamily: 'var(--font-display)' }}>
+              Resume Intel
+            </span>
+          </div>
+          <ThemeToggle />
         </header>
 
-        <main
-          className="flex-1 overflow-y-auto relative"
-          style={{
-            background: `
-              radial-gradient(ellipse 60% 40% at 80% 0%, oklch(0.72 0.18 195 / 0.05) 0%, transparent 60%),
-              radial-gradient(ellipse 40% 30% at 20% 100%, oklch(0.55 0.20 280 / 0.04) 0%, transparent 50%),
-              oklch(0.10 0.008 265)
-            `
-          }}
-        >
+        <main className="flex-1 overflow-y-auto relative mesh-bg">
           <div className="px-6 py-8 md:px-10 md:py-10 max-w-[1400px] mx-auto">
             {mounted && children}
           </div>

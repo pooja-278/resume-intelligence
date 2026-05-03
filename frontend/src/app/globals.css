@@ -3,15 +3,46 @@
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
-@custom-variant dark (&:is(.dark *));
 
 @theme {
   --font-sans: 'DM Sans', system-ui, sans-serif;
   --font-display: 'Syne', system-ui, sans-serif;
   --font-mono: 'DM Mono', monospace;
+  --variant-dark: (selector: .dark);
 }
 
 :root {
+  --background: oklch(0.98 0.005 265);
+  --foreground: oklch(0.12 0.010 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.12 0.010 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.12 0.010 265);
+  --primary: oklch(0.65 0.18 195);
+  --primary-foreground: oklch(0.98 0.005 265);
+  --secondary: oklch(0.94 0.010 265);
+  --secondary-foreground: oklch(0.12 0.010 265);
+  --muted: oklch(0.94 0.010 265);
+  --muted-foreground: oklch(0.45 0.015 265);
+  --accent: oklch(0.94 0.010 265);
+  --accent-foreground: oklch(0.12 0.010 265);
+  --destructive: oklch(0.55 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 265);
+  --border: oklch(0.88 0.010 265);
+  --input: oklch(0.88 0.010 265);
+  --ring: oklch(0.65 0.18 195);
+  --radius: 0.75rem;
+  --sidebar: oklch(0.98 0.005 265);
+  --sidebar-foreground: oklch(0.12 0.010 265);
+  --sidebar-primary: oklch(0.65 0.18 195);
+  --sidebar-primary-foreground: oklch(0.98 0.005 265);
+  --sidebar-accent: oklch(0.94 0.010 265);
+  --sidebar-accent-foreground: oklch(0.12 0.010 265);
+  --sidebar-border: oklch(0.88 0.010 265);
+  --sidebar-ring: oklch(0.65 0.18 195);
+}
+
+.dark {
   --background: oklch(0.10 0.008 265);
   --foreground: oklch(0.96 0.004 265);
   --card: oklch(0.13 0.008 265);
@@ -31,7 +62,6 @@
   --border: oklch(0.22 0.010 265);
   --input: oklch(0.18 0.010 265);
   --ring: oklch(0.72 0.18 195);
-  --radius: 0.75rem;
   --sidebar: oklch(0.12 0.010 265);
   --sidebar-foreground: oklch(0.96 0.004 265);
   --sidebar-primary: oklch(0.72 0.18 195);
@@ -102,8 +132,8 @@
   }
 
   ::selection {
-    background: oklch(0.72 0.18 195 / 0.3);
-    color: oklch(0.96 0.004 265);
+    background: var(--primary);
+    color: var(--primary-foreground);
   }
 
   ::-webkit-scrollbar {
@@ -112,37 +142,38 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: oklch(0.13 0.008 265);
+    background: var(--background);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: oklch(0.28 0.012 265);
+    background: var(--muted);
     border-radius: 999px;
+    border: 2px solid var(--background);
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.72 0.18 195 / 0.6);
+    background: var(--primary);
   }
 }
 
 .glass {
-  background: oklch(0.15 0.010 265 / 0.7);
+  background: color-mix(in oklch, var(--card), transparent 30%);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid oklch(0.30 0.010 265 / 0.5);
-  box-shadow: 0 4px 24px oklch(0.05 0.008 265 / 0.6), inset 0 1px 0 oklch(1 0 0 / 0.04);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 24px oklch(0 0 0 / 0.04), inset 0 1px 0 oklch(1 0 0 / 0.1);
 }
 
 .mesh-bg {
   background:
-    radial-gradient(ellipse 80% 50% at 20% 0%, oklch(0.72 0.18 195 / 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 60% at 80% 100%, oklch(0.55 0.20 280 / 0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 60% 40%, oklch(0.60 0.15 210 / 0.04) 0%, transparent 50%),
-    oklch(0.10 0.008 265);
+    radial-gradient(ellipse 80% 50% at 20% 0%, var(--primary) / 0.12 0%, transparent 60%),
+    radial-gradient(ellipse 50% 60% at 80% 100%, oklch(0.55 0.20 280 / 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 60% 40%, var(--primary) / 0.05 0%, transparent 50%),
+    var(--background);
 }
 
 .dot-grid {
-  background-image: radial-gradient(oklch(0.28 0.010 265 / 0.6) 1px, transparent 1px);
+  background-image: radial-gradient(var(--foreground) / 0.1 1px, transparent 1px);
   background-size: 28px 28px;
 }
 
@@ -160,9 +191,9 @@
 }
 
 .nav-active {
-  background: oklch(0.72 0.18 195 / 0.12) !important;
-  color: oklch(0.72 0.18 195) !important;
-  border-left: 2px solid oklch(0.72 0.18 195);
+  background: color-mix(in oklch, var(--primary), transparent 90%) !important;
+  color: var(--primary) !important;
+  border-left: 2px solid var(--primary);
   padding-left: calc(theme(spacing.3) - 2px) !important;
 }
 
@@ -286,7 +317,7 @@ textarea:focus-visible {
   font-family: 'DM Sans', sans-serif;
   font-size: 0.875rem;
   line-height: 1.7;
-  color: oklch(0.84 0.008 265);
+  color: var(--muted-foreground);
 }
 
 .ProseMirror p {
@@ -294,7 +325,7 @@ textarea:focus-visible {
 }
 
 .ProseMirror strong {
-  color: oklch(0.96 0.004 265);
+  color: var(--foreground);
   font-weight: 600;
 }
 
@@ -302,7 +333,7 @@ textarea:focus-visible {
 .ProseMirror h2,
 .ProseMirror h3 {
   font-family: 'Syne', sans-serif;
-  color: oklch(0.96 0.004 265);
+  color: var(--foreground);
   margin-bottom: 0.5rem;
   margin-top: 1.25rem;
 }

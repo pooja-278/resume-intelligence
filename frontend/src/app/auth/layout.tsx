@@ -27,16 +27,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
               <polyline points="10 9 9 9 8 9"/>
             </svg>
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2" style={{ fontFamily: 'var(--font-display)' }}>
             Resume Intelligence
           </h1>
-          <p className="text-sm text-white/40 tracking-widest uppercase font-mono">AI-Powered ATS Scoring</p>
+          <p className="text-sm text-muted-foreground tracking-widest uppercase font-mono">AI-Powered ATS Scoring</p>
         </div>
 
         {children}
 
         {/* Footer */}
-        <p className="text-center text-white/20 text-xs mt-8 animate-fade-in delay-500">
+        <p className="text-center text-muted-foreground/50 text-xs mt-8 animate-fade-in delay-500">
           Secured with end-to-end encryption
         </p>
       </div>

@@ -51,7 +51,7 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="absolute -rotate-90">
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none"
-          stroke="oklch(0.22 0.010 265)" strokeWidth="5" />
+          stroke="var(--border)" strokeWidth="5" />
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none"
           stroke={color} strokeWidth="5"
           strokeLinecap="round"
@@ -64,7 +64,7 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
         <span className="font-bold tabular-nums leading-none" style={{ color, fontSize: size * 0.25, fontFamily: 'var(--font-display)' }}>
           {Math.round(score)}
         </span>
-        <span className="font-mono tracking-widest uppercase mt-0.5" style={{ color: 'oklch(0.45 0.015 265)', fontSize: size * 0.12 }}>
+        <span className="font-mono tracking-widest uppercase mt-0.5" style={{ color: 'var(--muted-foreground)', fontSize: size * 0.12 }}>
           ATS
         </span>
       </div>
@@ -93,7 +93,7 @@ export default function ResumeAnalysisPage() {
       setEditedContent(editor.getHTML()); // capture edits
     },
     editorProps: {
-      attributes: { class: "prose prose-invert max-w-none focus:outline-none min-h-[500px]" },
+      attributes: { class: "prose dark:prose-invert max-w-none focus:outline-none min-h-[500px]" },
     },
     immediatelyRender: false
   });
@@ -150,17 +150,17 @@ export default function ResumeAnalysisPage() {
     return (
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center gap-4">
-          <Skeleton className="w-12 h-12 rounded-xl" style={{ background: 'oklch(0.18 0.010 265)' }} />
+          <Skeleton className="w-12 h-12 rounded-xl bg-muted" />
           <div className="space-y-2">
-            <Skeleton className="h-5 w-56" style={{ background: 'oklch(0.18 0.010 265)' }} />
-            <Skeleton className="h-3 w-32" style={{ background: 'oklch(0.18 0.010 265)' }} />
+            <Skeleton className="h-5 w-56 bg-muted" />
+            <Skeleton className="h-3 w-32 bg-muted" />
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Skeleton className="lg:col-span-2 h-[680px] rounded-2xl" style={{ background: 'oklch(0.15 0.010 265)' }} />
+          <Skeleton className="lg:col-span-2 h-[680px] rounded-2xl bg-muted/50" />
           <div className="space-y-5">
-            <Skeleton className="h-60 rounded-2xl" style={{ background: 'oklch(0.15 0.010 265)' }} />
-            <Skeleton className="h-72 rounded-2xl" style={{ background: 'oklch(0.15 0.010 265)' }} />
+            <Skeleton className="h-60 rounded-2xl bg-muted/50" />
+            <Skeleton className="h-72 rounded-2xl bg-muted/50" />
           </div>
         </div>
       </div>
@@ -275,7 +275,7 @@ export default function ResumeAnalysisPage() {
                 <span>/</span>
                 <span style={{ color: 'oklch(0.72 0.18 195)' }}>Analysis</span>
               </div>
-              <h1 className="text-2xl font-bold text-white truncate max-w-xs md:max-w-xl leading-tight"
+              <h1 className="text-2xl font-bold text-foreground truncate max-w-xs md:max-w-xl leading-tight"
                 style={{ fontFamily: 'var(--font-display)' }}>
                 {resume?.file_name ?? "Loading…"}
               </h1>
@@ -323,13 +323,12 @@ export default function ResumeAnalysisPage() {
         <div className="lg:col-span-2 animate-fade-in-up delay-100">
           <div className="glass rounded-2xl overflow-hidden flex flex-col" style={{ height: '680px' }}>
             {/* Editor toolbar */}
-            <div className="flex items-center justify-between px-5 py-3 border-b"
-              style={{ background: 'oklch(0.13 0.008 265)', borderColor: 'oklch(0.22 0.010 265)' }}>
+            <div className="flex items-center justify-between px-5 py-3 border-b bg-muted/30 border-border">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.55 0.22 25 / 0.8)' }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.78 0.18 72 / 0.8)' }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.75 0.18 152 / 0.8)' }} />
-                <span className="ml-3 text-xs font-mono" style={{ color: 'oklch(0.40 0.010 265)' }}>
+                <div className="w-3 h-3 rounded-full bg-destructive/80" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                <div className="w-3 h-3 rounded-full bg-primary/80" />
+                <span className="ml-3 text-xs font-mono text-muted-foreground">
                   resume-editor.tsx
                 </span>
               </div>
@@ -375,15 +374,15 @@ export default function ResumeAnalysisPage() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-6" style={{ background: 'oklch(0.115 0.008 265)' }}>
+            <div className="flex-1 overflow-y-auto p-6 bg-card">
               {!resume?.raw_text ? (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 animate-pulse">
-                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                  <div className="w-12 h-12 rounded-xl bg-accent border border-border flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary" />
                   </div>
                   <div>
-                    <h4 className="text-white font-medium">Processing Document</h4>
-                    <p className="text-xs text-white/40 mt-1 max-w-[280px]">
+                    <h4 className="text-foreground font-medium">Processing Document</h4>
+                    <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">
                       Our AI is extracting text and structure from your file. This usually takes 10-20 seconds.
                     </p>
                   </div>
@@ -403,10 +402,10 @@ export default function ResumeAnalysisPage() {
                 style={{ background: 'oklch(0.72 0.18 195 / 0.1)', border: '1px solid oklch(0.72 0.18 195 / 0.25)' }}>
                 <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
               </div>
-              <h3 className="text-base font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
+              <h3 className="text-base font-bold text-foreground mb-2" style={{ fontFamily: 'var(--font-display)' }}>
                 Analyzing with AI
               </h3>
-              <p className="text-sm" style={{ color: 'oklch(0.45 0.015 265)' }}>
+              <p className="text-sm text-muted-foreground">
                 Extracting skills, experience, and computing your ATS score…
               </p>
               <div className="w-full mt-6 space-y-2">
