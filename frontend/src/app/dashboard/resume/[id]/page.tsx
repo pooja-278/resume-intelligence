@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight } from "lucide-react";
+import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight, X } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
@@ -27,8 +27,12 @@ interface Analysis {
     skills_score?: number;
     experience_score?: number;
     keyword_match?: number;
-    general_improvements?: string[];
-    missing_skills?: string[];
+    to_change?: string[];
+    to_rephrase?: string[];
+    to_add?: string[];
+    to_learn?: string[];
+    general_improvements?: string[]; // fallback
+    missing_skills?: string[]; // fallback
   };
 }
 
@@ -113,7 +117,14 @@ export default function ResumeAnalysisPage() {
     try {
       const r = await api.get(`/resumes/${resumeId}`);
       setResume(r.data);
-    } catch { toast.error("Failed to fetch resume details"); }
+      
+      // If raw_text is still null, document is still being processed
+      if (!r.data.raw_text) {
+        setTimeout(fetchResume, 2000);
+      }
+    } catch { 
+      toast.error("Failed to fetch resume details"); 
+    }
   };
 
   const fetchAnalysis = async () => {
@@ -124,6 +135,7 @@ export default function ResumeAnalysisPage() {
     } catch (error: any) {
       if (error.response?.status === 404) {
         setPolling(true);
+        // Analysis not ready, poll again in 3s
         setTimeout(fetchAnalysis, 3000);
       } else {
         toast.error("Failed to fetch analysis");
@@ -301,7 +313,21 @@ export default function ResumeAnalysisPage() {
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-6" style={{ background: 'oklch(0.115 0.008 265)' }}>
-              <EditorContent editor={editor} />
+              {!resume?.raw_text ? (
+                <div className="h-full flex flex-col items-center justify-center text-center space-y-4 animate-pulse">
+                  <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                  </div>
+                  <div>
+                    <h4 className="text-white font-medium">Processing Document</h4>
+                    <p className="text-xs text-white/40 mt-1 max-w-[280px]">
+                      Our AI is extracting text and structure from your file. This usually takes 10-20 seconds.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <EditorContent editor={editor} />
+              )}
             </div>
           </div>
         </div>
@@ -365,21 +391,97 @@ export default function ResumeAnalysisPage() {
               </div>
 
               {/* AI Suggestions */}
-              {(analysis.feedback.general_improvements?.length || analysis.feedback.missing_skills?.length) && (
-                <div className="glass rounded-2xl p-5 animate-fade-in-up delay-100">
-                  <div className="flex items-center gap-2 mb-5">
-                    <Lightbulb className="w-4 h-4" style={{ color: 'oklch(0.78 0.18 72)' }} />
-                    <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
-                      AI Suggestions
-                    </h3>
-                  </div>
+              {(analysis.feedback.to_change?.length ||
+                analysis.feedback.to_rephrase?.length ||
+                analysis.feedback.to_add?.length ||
+                analysis.feedback.to_learn?.length ||
+                analysis.feedback.general_improvements?.length) && (
+                  <div className="glass rounded-2xl p-5 animate-fade-in-up delay-100 space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="w-4 h-4" style={{ color: 'oklch(0.78 0.18 72)' }} />
+                      <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
+                        AI Suggestions
+                      </h3>
+                    </div>
 
-                  {analysis.feedback.general_improvements && analysis.feedback.general_improvements.length > 0 && (
-                    <div className="mb-5">
-                      <p className="text-[10px] font-mono tracking-widest uppercase mb-3"
-                        style={{ color: 'oklch(0.42 0.010 265)' }}>
-                        How to improve
-                      </p>
+                    {/* TO CHANGE */}
+                    {analysis.feedback.to_change && analysis.feedback.to_change.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.62 0.22 25)' }}>
+                          Needs Change
+                        </p>
+                        <ul className="space-y-2">
+                          {analysis.feedback.to_change.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5 border border-red-500/10"
+                              style={{ background: 'oklch(0.62 0.22 25 / 0.05)', color: 'oklch(0.70 0.015 265)' }}>
+                              <X className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'oklch(0.62 0.22 25)' }} />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* TO REPHRASE */}
+                    {analysis.feedback.to_rephrase && analysis.feedback.to_rephrase.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.78 0.18 72)' }}>
+                          Better Phrasing
+                        </p>
+                        <ul className="space-y-2">
+                          {analysis.feedback.to_rephrase.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5 border border-yellow-500/10"
+                              style={{ background: 'oklch(0.78 0.18 72 / 0.05)', color: 'oklch(0.70 0.015 265)' }}>
+                              <TrendingUp className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'oklch(0.78 0.18 72)' }} />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* TO ADD */}
+                    {analysis.feedback.to_add && analysis.feedback.to_add.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.72 0.18 195)' }}>
+                          Consider Adding
+                        </p>
+                        <ul className="space-y-2">
+                          {analysis.feedback.to_add.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5 border border-cyan-500/10"
+                              style={{ background: 'oklch(0.72 0.18 195 / 0.05)', color: 'oklch(0.70 0.015 265)' }}>
+                              <CheckCircle2 className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* TO LEARN */}
+                    {analysis.feedback.to_learn && analysis.feedback.to_learn.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.75 0.18 152)' }}>
+                          Skills to Learn
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {analysis.feedback.to_learn.map((skill, i) => (
+                            <span key={i}
+                              className="text-[11px] px-2.5 py-1 rounded-full font-medium border"
+                              style={{
+                                background: 'oklch(0.75 0.18 152 / 0.08)',
+                                color: 'oklch(0.75 0.18 152)',
+                                borderColor: 'oklch(0.75 0.18 152 / 0.2)',
+                              }}>
+                              {skill}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fallback for old feedback structure */}
+                    {!analysis.feedback.to_change && analysis.feedback.general_improvements && (
                       <ul className="space-y-2">
                         {analysis.feedback.general_improvements.map((item, i) => (
                           <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5"
@@ -392,32 +494,9 @@ export default function ResumeAnalysisPage() {
                           </li>
                         ))}
                       </ul>
-                    </div>
-                  )}
-
-                  {analysis.feedback.missing_skills && analysis.feedback.missing_skills.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-mono tracking-widest uppercase mb-3"
-                        style={{ color: 'oklch(0.42 0.010 265)' }}>
-                        Consider adding
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {analysis.feedback.missing_skills.map((skill, i) => (
-                          <span key={i}
-                            className="text-xs px-2.5 py-1 rounded-full font-medium transition-colors cursor-default"
-                            style={{
-                              background: 'oklch(0.72 0.18 195 / 0.08)',
-                              color: 'oklch(0.72 0.18 195 / 0.9)',
-                              border: '1px solid oklch(0.72 0.18 195 / 0.2)',
-                            }}>
-                            + {skill}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                )}
             </>
           ) : null}
         </div>
