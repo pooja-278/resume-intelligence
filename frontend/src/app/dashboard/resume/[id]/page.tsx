@@ -5,11 +5,12 @@ import { useParams } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap } from "lucide-react";
+import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import Link from "next/link";
 
 interface Resume {
   id: number;
@@ -32,7 +33,7 @@ interface Analysis {
 }
 
 function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
-  const radius = 38;
+  const radius = (size / 2) - 6;
   const circumference = 2 * Math.PI * radius;
   const pct = Math.max(0, Math.min(100, score));
   const offset = circumference - (pct / 100) * circumference;
@@ -56,10 +57,10 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
         />
       </svg>
       <div className="flex flex-col items-center z-10">
-        <span className="text-2xl font-bold tabular-nums" style={{ color, fontFamily: 'var(--font-display)' }}>
+        <span className="font-bold tabular-nums leading-none" style={{ color, fontSize: size * 0.25, fontFamily: 'var(--font-display)' }}>
           {Math.round(score)}
         </span>
-        <span className="text-[9px] font-mono tracking-widest uppercase" style={{ color: 'oklch(0.45 0.015 265)' }}>
+        <span className="font-mono tracking-widest uppercase mt-0.5" style={{ color: 'oklch(0.45 0.015 265)', fontSize: size * 0.12 }}>
           ATS
         </span>
       </div>
@@ -192,46 +193,64 @@ export default function ResumeAnalysisPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-[1400px]">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 animate-fade-in-up">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-            style={{ background: 'oklch(0.72 0.18 195 / 0.1)', border: '1px solid oklch(0.72 0.18 195 / 0.25)' }}>
-            <FileText className="w-6 h-6" style={{ color: 'oklch(0.72 0.18 195)' }} />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-white truncate max-w-xs md:max-w-lg"
-              style={{ fontFamily: 'var(--font-display)' }}>
-              {resume?.file_name ?? "Loading…"}
-            </h1>
-            <div className="flex items-center gap-2 mt-1 text-sm">
-              {polling ? (
-                <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
-                  <span style={{ color: 'oklch(0.50 0.015 265)' }}>AI is analyzing…</span>
-                </>
-              ) : (
-                <>
-                  <CheckCircle2 className="w-3.5 h-3.5" style={{ color: 'oklch(0.75 0.18 152)' }} />
-                  <span style={{ color: 'oklch(0.50 0.015 265)' }}>Analysis complete</span>
-                </>
-              )}
+    <div className="space-y-8 max-w-[1440px] mx-auto px-4 py-6">
+      {/* Header / Breadcrumbs */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 animate-fade-in-up">
+        <div className="flex items-center gap-5">
+          <Link href="/dashboard" className="w-10 h-10 rounded-xl glass flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all">
+            <ArrowRight className="w-5 h-5 rotate-180" />
+          </Link>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
+              style={{ background: 'oklch(0.72 0.18 195 / 0.12)', border: '1px solid oklch(0.72 0.18 195 / 0.3)', boxShadow: '0 0 20px oklch(0.72 0.18 195 / 0.1)' }}>
+              <FileText className="w-6 h-6" style={{ color: 'oklch(0.72 0.18 195)' }} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase mb-1" style={{ color: 'oklch(0.50 0.015 265)' }}>
+                <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
+                <span>/</span>
+                <span style={{ color: 'oklch(0.72 0.18 195)' }}>Analysis</span>
+              </div>
+              <h1 className="text-2xl font-bold text-white truncate max-w-xs md:max-w-xl leading-tight"
+                style={{ fontFamily: 'var(--font-display)' }}>
+                {resume?.file_name ?? "Loading…"}
+              </h1>
             </div>
           </div>
         </div>
 
-        {analysis && !polling && (
-          <div className="animate-fade-in flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-xs font-mono tracking-widest uppercase" style={{ color: 'oklch(0.50 0.015 265)' }}>ATS Score</p>
-              <p className="text-xs mt-0.5" style={{ color: 'oklch(0.40 0.010 265)' }}>
-                {analysis.ats_score >= 80 ? "Excellent" : analysis.ats_score >= 60 ? "Good" : "Needs Work"}
-              </p>
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col items-end text-right">
+            <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase mb-1.5" style={{ color: 'oklch(0.50 0.015 265)' }}>
+              {polling ? (
+                <>
+                  <Loader2 className="w-3 h-3 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                  <span>Analyzing…</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'oklch(0.75 0.18 152)' }} />
+                  <span>Complete</span>
+                </>
+              )}
             </div>
-            <ScoreRing score={analysis.ats_score} />
+            <p className="text-xs font-medium" style={{ color: 'oklch(0.40 0.010 265)' }}>
+              Last updated today
+            </p>
           </div>
-        )}
+
+          {analysis && !polling && (
+            <div className="glass rounded-2xl p-1.5 pr-5 flex items-center gap-4 animate-fade-in ring-1 ring-white/5">
+              <ScoreRing score={analysis.ats_score} size={64} />
+              <div className="hidden sm:block">
+                <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: 'oklch(0.50 0.015 265)' }}>ATS Rating</p>
+                <p className="text-sm font-bold mt-0.5" style={{ color: scoreColor(analysis.ats_score) }}>
+                  {analysis.ats_score >= 80 ? "Premium" : analysis.ats_score >= 60 ? "Strong" : "Needs Polish"}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main grid */}
@@ -250,17 +269,36 @@ export default function ResumeAnalysisPage() {
                   resume-editor.tsx
                 </span>
               </div>
-              <button
-                onClick={handleSaveAndAnalyze}
-                disabled={saving}
-                className="px-4 py-2 rounded-lg text-xs font-medium"
-              >
-                {saving ? "Saving..." : "Save & Re-analyze"}
-              </button>
-              <span className="text-xs font-mono px-2 py-0.5 rounded"
-                style={{ background: 'oklch(0.72 0.18 195 / 0.1)', color: 'oklch(0.72 0.18 195 / 0.7)' }}>
-                Editable
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-white/5"
+                  style={{ background: 'oklch(1 0 0 / 0.03)', color: 'oklch(0.50 0.015 265)' }}>
+                  Auto-saving off
+                </span>
+                <button
+                  onClick={handleSaveAndAnalyze}
+                  disabled={saving || polling}
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    background: 'oklch(0.72 0.18 195)',
+                    color: 'oklch(0.10 0.008 265)',
+                    boxShadow: '0 0 15px oklch(0.72 0.18 195 / 0.2)'
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 25px oklch(0.72 0.18 195 / 0.4)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = '0 0 15px oklch(0.72 0.18 195 / 0.2)'}
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      Saving…
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-3.5 h-3.5 fill-current" />
+                      Save & Re-analyze
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
             <div className="flex-1 overflow-y-auto p-6" style={{ background: 'oklch(0.115 0.008 265)' }}>
               <EditorContent editor={editor} />

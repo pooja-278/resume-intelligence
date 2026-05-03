@@ -80,6 +80,16 @@ async def upload_resume(
     if len(file_bytes) > 5 * 1024 * 1024:  # 5MB limit
         raise HTTPException(status_code=400, detail="File too large. Max 5MB")
 
+    # Check for duplicate name
+    existing_result = await db.execute(
+        select(Resume).where(Resume.user_id == current_user.id, Resume.file_name == file.filename)
+    )
+    if existing_result.scalars().first():
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, 
+            detail="A resume with this name already exists. Please rename your file before uploading, or delete the existing one first."
+        )
+
     # Create Resume record with raw bytes
     new_resume = Resume(
         user_id=current_user.id,
@@ -244,3 +254,20 @@ async def reprocess_resume_from_text(resume_id: int, raw_text: str, db: AsyncSes
 
     except Exception as e:
         print(f"Re-analysis failed: {e}")
+
+@router.delete("/{resume_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_resume(
+    resume_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    result = await db.execute(
+        select(Resume).where(Resume.id == resume_id, Resume.user_id == current_user.id)
+    )
+    resume = result.scalars().first()
+    if not resume:
+        raise HTTPException(status_code=404, detail="Resume not found")
+        
+    await db.delete(resume)
+    await db.commit()
+    return None

@@ -26,7 +26,7 @@ class Resume(Base):
     structured_json = Column(JSONB, nullable=True)
 
     user = relationship("User", back_populates="resumes")
-    analysis_result = relationship("AnalysisResult", back_populates="resume", uselist=False)
+    analysis_result = relationship("AnalysisResult", back_populates="resume", uselist=False, cascade="all, delete-orphan")
 
 class AnalysisResult(Base):
     __tablename__ = "analysis_results"

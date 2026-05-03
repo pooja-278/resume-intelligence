@@ -24,6 +24,9 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   title: "Resume Intelligence — AI-Powered ATS Scoring",
   description: "Upload your resume and get instant AI-powered ATS analysis, scoring, and actionable feedback.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({

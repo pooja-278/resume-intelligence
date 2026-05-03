@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, ArrowRight, Sparkles, TrendingUp } from "lucide-react";
+import { Plus, FileText, ArrowRight, Sparkles, TrendingUp, Trash2, Loader2 } from "lucide-react";
 import api from "@/lib/api";
+import { toast } from "sonner";
 
 interface Resume {
   id: number;
@@ -14,6 +15,7 @@ interface Resume {
 export default function DashboardPage() {
   const [resumes, setResumes] = useState<Resume[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => { fetchResumes(); }, []);
 
@@ -25,6 +27,25 @@ export default function DashboardPage() {
       console.error("Failed to fetch resumes", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: number) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm("Are you sure you want to delete this resume?")) return;
+    
+    setDeletingId(id);
+    try {
+      await api.delete(`/resumes/${id}`);
+      setResumes(prev => prev.filter(r => r.id !== id));
+      toast.success("Resume deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete resume");
+      console.error(error);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -132,6 +153,18 @@ export default function DashboardPage() {
                     <h3 className="font-semibold text-white truncate text-sm" title={baseName}>{baseName}</h3>
                     <p className="text-xs mt-0.5" style={{ color: 'oklch(0.55 0.015 265)' }}>Ready for analysis</p>
                   </div>
+                  <button
+                    onClick={(e) => handleDelete(e, resume.id)}
+                    disabled={deletingId === resume.id}
+                    className="p-2 rounded-lg transition-all duration-200 hover:bg-red-500/10 group/trash"
+                    title="Delete resume"
+                  >
+                    {deletingId === resume.id ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-red-400" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 text-white/20 group-hover/trash:text-red-400" />
+                    )}
+                  </button>
                 </div>
 
                 <div className="h-px mb-5" style={{ background: 'oklch(0.22 0.010 265)' }} />

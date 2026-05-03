@@ -77,25 +77,34 @@ async def calculate_ats_score(structured_json: dict, job_description: str = None
          return {"ats_score": 0, "feedback": {"error": "AI not initialized"}}
 
     prompt = f"""
-    You are an expert ATS (Applicant Tracking System). Analyze the following resume data.
+    You are an expert ATS (Applicant Tracking System) and Career Coach. Analyze the following resume data.
     Calculate an ATS score from 0-100 based on Formatting (10%), Skills (20%), Experience (30%), and Keyword Match (40%).
-    If no Job Description is provided, assume general software engineering / relevant field best practices for keyword match.
+    
+    Provide detailed, categorized feedback for the user to improve their resume.
+    Categories required:
+    1. to_change: Specific things that are wrong or counter-productive.
+    2. to_rephrase: Content that is good but could be worded more professionally or impactfully.
+    3. to_add: Missing sections, metrics, or details that would strengthen the resume.
+    4. to_learn: Specific technical skills or certifications the candidate should acquire based on current market trends for their role.
     
     Return the result as pure JSON.
     Format required:
     {{
       "ats_score": 85,
       "feedback": {{
-        "formatting": "Feedback on formatting",
-        "skills": "Feedback on skills",
-        "experience": "Feedback on experience",
-        "keywords": "Feedback on keyword matches or missing keywords",
-        "general_improvements": ["Improvement 1", "Improvement 2"]
+        "formatting_score": 90,
+        "skills_score": 80,
+        "experience_score": 85,
+        "keyword_match": 85,
+        "to_change": ["Remove objective statement", "Fix font consistency"],
+        "to_rephrase": ["Use active verbs in experience section", "Quantify achievements"],
+        "to_add": ["Add a Projects section", "Include LinkedIn profile link"],
+        "to_learn": ["Docker", "Kubernetes", "Advanced System Design"]
       }}
     }}
     
     Job Description:
-    {job_description or "General Best Practices"}
+    {job_description or "General Best Practices for Software Engineering/Tech roles"}
     
     Resume JSON:
     {json.dumps(structured_json, indent=2)}

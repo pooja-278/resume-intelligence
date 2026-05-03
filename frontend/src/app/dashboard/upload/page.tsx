@@ -4,9 +4,10 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { Progress } from "@/components/ui/progress";
-import { FileText, UploadCloud, X, Loader2, CheckCircle2, ArrowRight, Zap } from "lucide-react";
+import { FileText, UploadCloud, X, Loader2, CheckCircle2, ArrowRight, Zap, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import api from "@/lib/api";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function UploadPage() {
   const router = useRouter();
@@ -14,9 +15,13 @@ export default function UploadPage() {
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [done, setDone] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
-    if (acceptedFiles.length > 0) setFile(acceptedFiles[0]);
+    if (acceptedFiles.length > 0) {
+      setFile(acceptedFiles[0]);
+      setErrorMsg(null);
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -37,6 +42,7 @@ export default function UploadPage() {
     if (!file) return;
     setUploading(true);
     setProgress(10);
+    setErrorMsg(null);
     const formData = new FormData();
     formData.append("file", file);
     try {
@@ -52,7 +58,9 @@ export default function UploadPage() {
       toast.success("Resume uploaded and queued for analysis!");
       setTimeout(() => router.push(`/dashboard/resume/${response.data.id}`), 900);
     } catch (error: any) {
-      toast.error(error.response?.data?.detail || "Upload failed. Please try again.");
+      const msg = error.response?.data?.detail || "Upload failed. Please try again.";
+      setErrorMsg(msg);
+      toast.error("Upload failed");
       setUploading(false);
       setProgress(0);
     }
@@ -83,6 +91,16 @@ export default function UploadPage() {
         </h1>
         <p className="text-white/40 text-sm mt-1">PDF or DOCX format · Max 5 MB</p>
       </div>
+
+      {errorMsg && (
+        <Alert variant="destructive" className="animate-fade-in border-red-500/20 bg-red-500/10 text-red-400">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Upload Error</AlertTitle>
+          <AlertDescription>
+            {errorMsg}
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Drop zone or file preview */}
       <div className="glass rounded-2xl overflow-hidden animate-fade-in-up delay-100">
