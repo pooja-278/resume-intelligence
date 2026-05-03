@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight, X } from "lucide-react";
+import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight, X, Download } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
@@ -204,6 +204,58 @@ export default function ResumeAnalysisPage() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!editor) return;
+
+    try {
+      // @ts-ignore - html2pdf doesn't have official types
+      const html2pdf = (await import("html2pdf.js")).default;
+      const element = document.querySelector(".tiptap.ProseMirror");
+
+      if (!element) {
+        toast.error("Could not find resume content to download");
+        return;
+      }
+
+      const opt = {
+        margin: 0.75,
+        filename: `${resume?.file_name.replace(/\.[^/.]+$/, "") || "resume"}_edited.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true,
+          letterRendering: true
+        },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+
+      // Clone element to avoid modifying the UI
+      const clone = element.cloneNode(true) as HTMLElement;
+      clone.style.color = "black";
+      clone.style.background = "white";
+      clone.style.padding = "0";
+      clone.style.width = "100%";
+      clone.classList.remove("prose-invert");
+      
+      // Ensure text is black for PDF
+      const allText = clone.querySelectorAll("*");
+      allText.forEach((el: any) => {
+        el.style.color = "black";
+      });
+
+      const wrapper = document.createElement("div");
+      wrapper.style.padding = "10px";
+      wrapper.style.background = "white";
+      wrapper.appendChild(clone);
+
+      html2pdf().set(opt as any).from(wrapper).save();
+      toast.success("Downloading PDF...");
+    } catch (error) {
+      console.error("PDF download error:", error);
+      toast.error("Failed to generate PDF");
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-[1440px] mx-auto px-4 py-6">
       {/* Header / Breadcrumbs */}
@@ -298,17 +350,28 @@ export default function ResumeAnalysisPage() {
                   onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 25px oklch(0.72 0.18 195 / 0.4)'}
                   onMouseLeave={e => e.currentTarget.style.boxShadow = '0 0 15px oklch(0.72 0.18 195 / 0.2)'}
                 >
-                  {saving ? (
-                    <>
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      Saving…
-                    </>
-                  ) : (
-                    <>
-                      <Zap className="w-3.5 h-3.5 fill-current" />
-                      Save & Re-analyze
-                    </>
-                  )}
+                    {saving ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Saving…
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-3.5 h-3.5 fill-current" />
+                        Save & Re-analyze
+                      </>
+                    )}
+                  </button>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 hover:bg-white/10 border border-white/10"
+                  style={{
+                    background: 'oklch(0.15 0.010 265)',
+                    color: 'oklch(0.72 0.18 195)',
+                  }}
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Download PDF
                 </button>
               </div>
             </div>
