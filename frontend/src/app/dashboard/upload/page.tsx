@@ -82,7 +82,7 @@ export default function UploadPage() {
       <div className="animate-fade-in-up">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs font-mono tracking-widest uppercase px-2 py-0.5 rounded-full border"
-            style={{ color: 'oklch(0.72 0.18 195)', borderColor: 'oklch(0.72 0.18 195 / 0.3)', background: 'oklch(0.72 0.18 195 / 0.08)' }}>
+            style={{ color: 'hsl(195 80% 72%)', borderColor: 'hsl(195 80% 72% / 0.3)', background: 'hsl(195 80% 72% / 0.08)' }}>
             Upload
           </span>
         </div>
@@ -109,7 +109,7 @@ export default function UploadPage() {
             {...getRootProps()}
             className={`relative flex flex-col items-center justify-center p-16 text-center cursor-pointer transition-all duration-200 rounded-2xl
               ${isDragActive ? "" : "hover:bg-white/[0.02]"}`}
-            style={isDragActive ? { background: 'oklch(0.72 0.18 195 / 0.06)', boxShadow: 'inset 0 0 0 2px oklch(0.72 0.18 195 / 0.4)' } : {}}
+            style={isDragActive ? { background: 'hsl(188 100% 42% / 0.06)', boxShadow: 'inset 0 0 0 2px hsl(188 100% 42% / 0.4)' } : {}}
           >
             <input {...getInputProps()} />
 
@@ -117,12 +117,12 @@ export default function UploadPage() {
             <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 transition-all duration-300
               ${isDragActive ? "scale-110" : ""}`}
               style={{
-                background: isDragActive ? 'oklch(0.72 0.18 195 / 0.15)' : 'oklch(0.18 0.010 265)',
-                border: `2px dashed ${isDragActive ? 'oklch(0.72 0.18 195 / 0.6)' : 'oklch(0.30 0.010 265)'}`,
-                boxShadow: isDragActive ? '0 0 30px oklch(0.72 0.18 195 / 0.2)' : 'none'
+                background: isDragActive ? 'hsl(188 100% 42% / 0.15)' : 'hsl(265 15% 10%)',
+                border: `2px dashed ${isDragActive ? 'hsl(188 100% 42% / 0.6)' : 'hsl(265 15% 14%)'}`,
+                boxShadow: isDragActive ? '0 0 30px hsl(188 100% 42% / 0.2)' : 'none'
               }}>
               <UploadCloud className={`w-9 h-9 transition-colors ${isDragActive ? "animate-bounce" : ""}`}
-                style={{ color: isDragActive ? 'oklch(0.72 0.18 195)' : 'oklch(0.45 0.015 265)' }} />
+                style={{ color: isDragActive ? 'hsl(188 100% 42%)' : 'hsl(265 8% 45%)' }} />
             </div>
 
             <h3 className="text-lg font-semibold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
@@ -135,13 +135,13 @@ export default function UploadPage() {
             <div className="flex items-center gap-6 text-xs text-white/25 font-mono">
               <span className="flex items-center gap-1.5">
                 <span className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold"
-                  style={{ background: 'oklch(0.55 0.22 25 / 0.2)', color: 'oklch(0.65 0.20 25)' }}>PDF</span>
+                  style={{ background: 'hsl(5 85% 55% / 0.2)', color: 'hsl(5 85% 55%)' }}>PDF</span>
                 Supported
               </span>
               <span className="w-px h-3 bg-white/10" />
               <span className="flex items-center gap-1.5">
                 <span className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-bold"
-                  style={{ background: 'oklch(0.55 0.20 200 / 0.2)', color: 'oklch(0.65 0.18 200)' }}>DOC</span>
+                  style={{ background: 'hsl(188 100% 42% / 0.2)', color: 'hsl(188 100% 42%)' }}>DOC</span>
                 Supported
               </span>
               <span className="w-px h-3 bg-white/10" />
@@ -152,18 +152,18 @@ export default function UploadPage() {
           <div className="p-8 space-y-8">
             {/* File info */}
             <div className="flex items-center gap-4 p-4 rounded-xl"
-              style={{ background: 'oklch(0.16 0.010 265)', border: '1px solid oklch(0.25 0.010 265)' }}>
+              style={{ background: 'hsl(265 15% 10%)', border: '1px solid hsl(265 15% 14%)' }}>
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 relative"
-                style={{ background: 'oklch(0.72 0.18 195 / 0.1)', border: '1px solid oklch(0.72 0.18 195 / 0.25)' }}>
-                <FileText className="w-6 h-6" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                style={{ background: 'hsl(188 100% 42% / 0.1)', border: '1px solid hsl(188 100% 42% / 0.25)' }}>
+                <FileText className="w-6 h-6" style={{ color: 'hsl(188 100% 42%)' }} />
                 <span className="absolute -bottom-1.5 -right-1.5 text-[8px] font-mono font-bold px-1 rounded leading-none py-0.5"
-                  style={{ background: 'oklch(0.72 0.18 195)', color: 'oklch(0.10 0.008 265)' }}>
+                  style={{ background: 'hsl(188 100% 42%)', color: 'hsl(265 25% 4%)' }}>
                   {fileExt}
                 </span>
               </div>
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-white truncate">{file.name}</p>
-                <p className="text-xs mt-0.5" style={{ color: 'oklch(0.50 0.015 265)' }}>{fileSizeMB} MB</p>
+                <p className="text-xs mt-0.5" style={{ color: 'hsl(265 8% 55%)' }}>{fileSizeMB} MB</p>
               </div>
               {!uploading && (
                 <button onClick={() => setFile(null)}
@@ -181,11 +181,11 @@ export default function UploadPage() {
                     <span className="text-white/50 font-mono text-xs tracking-wider uppercase">
                       {done ? "Complete" : "Processing…"}
                     </span>
-                    <span className="font-bold tabular-nums text-sm" style={{ color: 'oklch(0.72 0.18 195)', fontFamily: 'var(--font-mono)' }}>
+                    <span className="font-bold tabular-nums text-sm" style={{ color: 'hsl(188 100% 42%)', fontFamily: 'var(--font-mono)' }}>
                       {progress}%
                     </span>
                   </div>
-                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'oklch(0.20 0.010 265)' }}>
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'hsl(265 15% 14%)' }}>
                     <Progress value={progress} className="h-1.5 bg-transparent" />
                   </div>
                 </div>
@@ -195,12 +195,12 @@ export default function UploadPage() {
                     <div key={label} className="flex items-center gap-3 text-sm">
                       <div className="w-4 h-4 shrink-0 flex items-center justify-center">
                         {stageDone ? (
-                          <CheckCircle2 className="w-4 h-4" style={{ color: 'oklch(0.75 0.18 152)' }} />
+                          <CheckCircle2 className="w-4 h-4" style={{ color: 'hsl(152 100% 45%)' }} />
                         ) : (
-                          <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.28 0.010 265)' }} />
+                          <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(265 15% 14%)' }} />
                         )}
                       </div>
-                      <span style={{ color: stageDone ? 'oklch(0.75 0.015 265)' : 'oklch(0.40 0.010 265)' }}>
+                      <span style={{ color: stageDone ? 'hsl(265 10% 80%)' : 'hsl(265 8% 45%)' }}>
                         {label}
                       </span>
                     </div>
@@ -215,18 +215,18 @@ export default function UploadPage() {
                 onClick={handleUpload}
                 className="w-full h-13 rounded-xl font-semibold text-sm flex items-center justify-center gap-2.5 transition-all duration-200 group"
                 style={{
-                  background: 'oklch(0.72 0.18 195)',
-                  color: 'oklch(0.10 0.008 265)',
+                  background: 'hsl(188 100% 42%)',
+                  color: 'hsl(265 25% 4%)',
                   height: '52px',
-                  boxShadow: '0 0 20px oklch(0.72 0.18 195 / 0.25)'
+                  boxShadow: '0 0 20px hsl(188 100% 42% / 0.25)'
                 }}
                 onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.background = 'oklch(0.78 0.18 195)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 0 30px oklch(0.72 0.18 195 / 0.4)';
+                  (e.currentTarget as HTMLElement).style.background = 'hsl(188 100% 48%)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 0 30px hsl(188 100% 42% / 0.4)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.background = 'oklch(0.72 0.18 195)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px oklch(0.72 0.18 195 / 0.25)';
+                  (e.currentTarget as HTMLElement).style.background = 'hsl(188 100% 42%)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px hsl(188 100% 42% / 0.25)';
                 }}
               >
                 <Zap className="w-4 h-4" />

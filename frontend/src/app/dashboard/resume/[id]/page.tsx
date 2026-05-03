@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight, X } from "lucide-react";
+import { FileText, Award, Lightbulb, Loader2, CheckCircle2, TrendingUp, Target, Zap, ArrowRight, X, Download } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "sonner";
@@ -43,15 +43,15 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
   const offset = circumference - (pct / 100) * circumference;
 
   const color =
-    pct >= 80 ? "oklch(0.75 0.18 152)" :
-      pct >= 60 ? "oklch(0.78 0.18 72)" :
-        "oklch(0.62 0.22 25)";
+    pct >= 80 ? "hsl(152 100% 45%)" :
+      pct >= 60 ? "hsl(72 100% 45%)" :
+        "hsl(5 85% 55%)";
 
   return (
     <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="absolute -rotate-90">
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none"
-          stroke="oklch(0.22 0.010 265)" strokeWidth="5" />
+          stroke="hsl(265 15% 14%)" strokeWidth="5" />
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none"
           stroke={color} strokeWidth="5"
           strokeLinecap="round"
@@ -64,7 +64,7 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
         <span className="font-bold tabular-nums leading-none" style={{ color, fontSize: size * 0.25, fontFamily: 'var(--font-display)' }}>
           {Math.round(score)}
         </span>
-        <span className="font-mono tracking-widest uppercase mt-0.5" style={{ color: 'oklch(0.45 0.015 265)', fontSize: size * 0.12 }}>
+        <span className="font-mono tracking-widest uppercase mt-0.5" style={{ color: 'hsl(265 8% 45%)', fontSize: size * 0.12 }}>
           ATS
         </span>
       </div>
@@ -72,9 +72,11 @@ function ScoreRing({ score, size = 96 }: { score: number; size?: number }) {
   );
 }
 
-const scoreColor = (v: number) =>
-  v >= 80 ? "oklch(0.75 0.18 152)" : v >= 60 ? "oklch(0.78 0.18 72)" : "oklch(0.62 0.22 25)";
-
+  const scoreColor = (s: number) => {
+    if (s >= 80) return "hsl(152 100% 45%)";
+    if (s >= 60) return "hsl(72 100% 45%)";
+    return "hsl(5 85% 55%)";
+  };
 export default function ResumeAnalysisPage() {
   const params = useParams();
   const resumeId = params?.id;
@@ -150,17 +152,17 @@ export default function ResumeAnalysisPage() {
     return (
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center gap-4">
-          <Skeleton className="w-12 h-12 rounded-xl" style={{ background: 'oklch(0.18 0.010 265)' }} />
+          <Skeleton className="w-12 h-12 rounded-xl" style={{ background: 'hsl(265 10% 18%)' }} />
           <div className="space-y-2">
-            <Skeleton className="h-5 w-56" style={{ background: 'oklch(0.18 0.010 265)' }} />
-            <Skeleton className="h-3 w-32" style={{ background: 'oklch(0.18 0.010 265)' }} />
+            <Skeleton className="h-5 w-56" style={{ background: 'hsl(265 10% 18%)' }} />
+            <Skeleton className="h-3 w-32" style={{ background: 'hsl(265 10% 18%)' }} />
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Skeleton className="lg:col-span-2 h-[680px] rounded-2xl" style={{ background: 'oklch(0.15 0.010 265)' }} />
+          <Skeleton className="lg:col-span-2 h-[680px] rounded-2xl" style={{ background: 'hsl(265 10% 15%)' }} />
           <div className="space-y-5">
-            <Skeleton className="h-60 rounded-2xl" style={{ background: 'oklch(0.15 0.010 265)' }} />
-            <Skeleton className="h-72 rounded-2xl" style={{ background: 'oklch(0.15 0.010 265)' }} />
+            <Skeleton className="h-60 rounded-2xl" style={{ background: 'hsl(265 10% 15%)' }} />
+            <Skeleton className="h-72 rounded-2xl" style={{ background: 'hsl(265 10% 15%)' }} />
           </div>
         </div>
       </div>
@@ -204,6 +206,42 @@ export default function ResumeAnalysisPage() {
     }
   };
 
+  const handleDownloadPDF = async () => {
+    if (!editor) return;
+    
+    const element = document.querySelector(".tiptap") as HTMLElement;
+    if (!element) return;
+
+    try {
+      toast.info("Preparing your PDF...");
+      // @ts-ignore
+      const html2pdf = (await import("html2pdf.js")).default;
+      
+      const opt = {
+        margin: 0,
+        filename: `${resume?.file_name.replace(/\.[^/.]+$/, "")}_Optimized.pdf`,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: "#ffffff" },
+        jsPDF: { unit: "in", format: "letter", orientation: "portrait" }
+      };
+
+      // Temporarily add class for PDF styling
+      element.classList.add("pdf-export");
+      
+      await html2pdf().set(opt).from(element).save();
+      
+      // Remove the class after generation
+      element.classList.remove("pdf-export");
+      
+      toast.success("Resume downloaded successfully!");
+    } catch (err) {
+      console.error(err);
+      // Ensure class is removed even on error
+      element.classList.remove("pdf-export");
+      toast.error("Failed to generate PDF");
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-[1440px] mx-auto px-4 py-6">
       {/* Header / Breadcrumbs */}
@@ -214,14 +252,14 @@ export default function ResumeAnalysisPage() {
           </Link>
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0"
-              style={{ background: 'oklch(0.72 0.18 195 / 0.12)', border: '1px solid oklch(0.72 0.18 195 / 0.3)', boxShadow: '0 0 20px oklch(0.72 0.18 195 / 0.1)' }}>
-              <FileText className="w-6 h-6" style={{ color: 'oklch(0.72 0.18 195)' }} />
+              style={{ background: 'hsl(188 100% 42% / 0.12)', border: '1px solid hsl(188 100% 42% / 0.3)', boxShadow: '0 0 20px hsl(188 100% 42% / 0.1)' }}>
+              <FileText className="w-6 h-6" style={{ color: 'hsl(188 100% 42%)' }} />
             </div>
             <div className="min-w-0">
-              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase mb-1" style={{ color: 'oklch(0.50 0.015 265)' }}>
+              <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase mb-1" style={{ color: 'hsl(265 8% 55%)' }}>
                 <Link href="/dashboard" className="hover:text-white transition-colors">Dashboard</Link>
                 <span>/</span>
-                <span style={{ color: 'oklch(0.72 0.18 195)' }}>Analysis</span>
+                <span style={{ color: 'hsl(188 100% 42%)' }}>Analysis</span>
               </div>
               <h1 className="text-2xl font-bold text-white truncate max-w-xs md:max-w-xl leading-tight"
                 style={{ fontFamily: 'var(--font-display)' }}>
@@ -233,20 +271,20 @@ export default function ResumeAnalysisPage() {
 
         <div className="flex items-center gap-6">
           <div className="flex flex-col items-end text-right">
-            <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase mb-1.5" style={{ color: 'oklch(0.50 0.015 265)' }}>
+            <div className="flex items-center gap-2 text-[10px] font-mono tracking-widest uppercase mb-1.5" style={{ color: 'hsl(265 8% 55%)' }}>
               {polling ? (
                 <>
-                  <Loader2 className="w-3 h-3 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                  <Loader2 className="w-3 h-3 animate-spin" style={{ color: 'hsl(188 100% 42%)' }} />
                   <span>Analyzing…</span>
                 </>
               ) : (
                 <>
-                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'oklch(0.75 0.18 152)' }} />
+                  <div className="w-1.5 h-1.5 rounded-full" style={{ background: 'hsl(152 100% 45%)' }} />
                   <span>Complete</span>
                 </>
               )}
             </div>
-            <p className="text-xs font-medium" style={{ color: 'oklch(0.40 0.010 265)' }}>
+            <p className="text-xs font-medium" style={{ color: 'hsl(265 8% 45%)' }}>
               Last updated today
             </p>
           </div>
@@ -255,7 +293,7 @@ export default function ResumeAnalysisPage() {
             <div className="glass rounded-2xl p-1.5 pr-5 flex items-center gap-4 animate-fade-in ring-1 ring-white/5">
               <ScoreRing score={analysis.ats_score} size={64} />
               <div className="hidden sm:block">
-                <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: 'oklch(0.50 0.015 265)' }}>ATS Rating</p>
+                <p className="text-[10px] font-mono tracking-widest uppercase" style={{ color: 'hsl(265 8% 55%)' }}>ATS Rating</p>
                 <p className="text-sm font-bold mt-0.5" style={{ color: scoreColor(analysis.ats_score) }}>
                   {analysis.ats_score >= 80 ? "Premium" : analysis.ats_score >= 60 ? "Strong" : "Needs Polish"}
                 </p>
@@ -272,31 +310,38 @@ export default function ResumeAnalysisPage() {
           <div className="glass rounded-2xl overflow-hidden flex flex-col" style={{ height: '680px' }}>
             {/* Editor toolbar */}
             <div className="flex items-center justify-between px-5 py-3 border-b"
-              style={{ background: 'oklch(0.13 0.008 265)', borderColor: 'oklch(0.22 0.010 265)' }}>
+              style={{ background: 'hsl(265 15% 10%)', borderColor: 'hsl(265 15% 14%)' }}>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.55 0.22 25 / 0.8)' }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.78 0.18 72 / 0.8)' }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: 'oklch(0.75 0.18 152 / 0.8)' }} />
-                <span className="ml-3 text-xs font-mono" style={{ color: 'oklch(0.40 0.010 265)' }}>
+                <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(25 80% 55% / 0.8)' }} />
+                <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(72 100% 45% / 0.8)' }} />
+                <div className="w-3 h-3 rounded-full" style={{ background: 'hsl(152 100% 45% / 0.8)' }} />
+                <span className="ml-3 text-xs font-mono" style={{ color: 'hsl(265 8% 45%)' }}>
                   resume-editor.tsx
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-white/5"
-                  style={{ background: 'oklch(1 0 0 / 0.03)', color: 'oklch(0.50 0.015 265)' }}>
+                  style={{ background: 'hsl(0 0% 100% / 0.03)', color: 'hsl(265 8% 55%)' }}>
                   Auto-saving off
                 </span>
+                <button
+                  onClick={handleDownloadPDF}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 glass hover:bg-white/10 active:scale-95 text-white/70 hover:text-white"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Download PDF
+                </button>
                 <button
                   onClick={handleSaveAndAnalyze}
                   disabled={saving || polling}
                   className="flex items-center gap-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                   style={{
-                    background: 'oklch(0.72 0.18 195)',
-                    color: 'oklch(0.10 0.008 265)',
-                    boxShadow: '0 0 15px oklch(0.72 0.18 195 / 0.2)'
+                    background: 'hsl(188 100% 42%)',
+                    color: 'hsl(265 25% 4%)',
+                    boxShadow: '0 0 15px hsl(188 100% 42% / 0.2)'
                   }}
-                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 25px oklch(0.72 0.18 195 / 0.4)'}
-                  onMouseLeave={e => e.currentTarget.style.boxShadow = '0 0 15px oklch(0.72 0.18 195 / 0.2)'}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = '0 0 25px hsl(188 100% 42% / 0.4)'}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = '0 0 15px hsl(188 100% 42% / 0.2)'}
                 >
                   {saving ? (
                     <>
@@ -312,11 +357,11 @@ export default function ResumeAnalysisPage() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-6" style={{ background: 'oklch(0.115 0.008 265)' }}>
+            <div className="flex-1 overflow-y-auto p-6" style={{ background: 'hsl(265 25% 4%)' }}>
               {!resume?.raw_text ? (
                 <div className="h-full flex flex-col items-center justify-center text-center space-y-4 animate-pulse">
                   <div className="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
-                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                    <Loader2 className="w-6 h-6 animate-spin" style={{ color: 'hsl(188 100% 42%)' }} />
                   </div>
                   <div>
                     <h4 className="text-white font-medium">Processing Document</h4>
@@ -337,18 +382,18 @@ export default function ResumeAnalysisPage() {
           {polling ? (
             <div className="glass rounded-2xl p-8 flex flex-col items-center justify-center text-center animate-fade-in">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5"
-                style={{ background: 'oklch(0.72 0.18 195 / 0.1)', border: '1px solid oklch(0.72 0.18 195 / 0.25)' }}>
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                style={{ background: 'hsl(188 100% 42% / 0.1)', border: '1px solid hsl(188 100% 42% / 0.25)' }}>
+                <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'hsl(188 100% 42%)' }} />
               </div>
               <h3 className="text-base font-bold text-white mb-2" style={{ fontFamily: 'var(--font-display)' }}>
                 Analyzing with AI
               </h3>
-              <p className="text-sm" style={{ color: 'oklch(0.45 0.015 265)' }}>
+              <p className="text-sm" style={{ color: 'hsl(265 8% 45%)' }}>
                 Extracting skills, experience, and computing your ATS score…
               </p>
               <div className="w-full mt-6 space-y-2">
                 {["Parsing structure", "Extracting keywords", "Scoring ATS fit"].map((s, i) => (
-                  <div key={s} className="flex items-center gap-2 text-xs" style={{ color: 'oklch(0.40 0.010 265)' }}>
+                  <div key={s} className="flex items-center gap-2 text-xs" style={{ color: 'hsl(265 8% 40%)' }}>
                     <Loader2 className="w-3 h-3 animate-spin shrink-0" style={{ animationDelay: `${i * 0.3}s` }} />
                     {s}
                   </div>
@@ -360,7 +405,7 @@ export default function ResumeAnalysisPage() {
               {/* Score breakdown */}
               <div className="glass rounded-2xl p-5 animate-fade-in-up">
                 <div className="flex items-center gap-2 mb-5">
-                  <Award className="w-4 h-4" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                  <Award className="w-4 h-4" style={{ color: 'hsl(188 100% 42%)' }} />
                   <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
                     Score Breakdown
                   </h3>
@@ -373,14 +418,14 @@ export default function ResumeAnalysisPage() {
                       <div key={key}>
                         <div className="flex items-center justify-between mb-1.5">
                           <div className="flex items-center gap-2">
-                            <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: 'oklch(0.50 0.015 265)' }} />
-                            <span className="text-xs font-medium" style={{ color: 'oklch(0.70 0.015 265)' }}>{key}</span>
+                            <Icon className="w-3.5 h-3.5 shrink-0" style={{ color: 'hsl(265 8% 55%)' }} />
+                            <span className="text-xs font-medium" style={{ color: 'hsl(265 8% 70%)' }}>{key}</span>
                           </div>
                           <span className="text-xs font-bold font-mono" style={{ color }}>
-                            {Math.round(v)}<span style={{ color: 'oklch(0.40 0.010 265)' }}>/100</span>
+                            {Math.round(v)}<span style={{ color: 'hsl(265 8% 40%)' }}>/100</span>
                           </span>
                         </div>
-                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'oklch(0.20 0.010 265)' }}>
+                        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'hsl(265 15% 14%)' }}>
                           <div className="h-full rounded-full transition-all duration-700"
                             style={{ width: `${v}%`, background: color, boxShadow: `0 0 6px ${color}60` }} />
                         </div>
@@ -398,7 +443,7 @@ export default function ResumeAnalysisPage() {
                 analysis.feedback.general_improvements?.length) && (
                   <div className="glass rounded-2xl p-5 animate-fade-in-up delay-100 space-y-6">
                     <div className="flex items-center gap-2 mb-2">
-                      <Lightbulb className="w-4 h-4" style={{ color: 'oklch(0.78 0.18 72)' }} />
+                      <Lightbulb className="w-4 h-4" style={{ color: 'hsl(72 100% 45%)' }} />
                       <h3 className="text-sm font-bold text-white" style={{ fontFamily: 'var(--font-display)' }}>
                         AI Suggestions
                       </h3>
@@ -407,14 +452,14 @@ export default function ResumeAnalysisPage() {
                     {/* TO CHANGE */}
                     {analysis.feedback.to_change && analysis.feedback.to_change.length > 0 && (
                       <div>
-                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.62 0.22 25)' }}>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'hsl(5 85% 55%)' }}>
                           Needs Change
                         </p>
                         <ul className="space-y-2">
                           {analysis.feedback.to_change.map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5 border border-red-500/10"
-                              style={{ background: 'oklch(0.62 0.22 25 / 0.05)', color: 'oklch(0.70 0.015 265)' }}>
-                              <X className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'oklch(0.62 0.22 25)' }} />
+                              style={{ background: 'hsl(5 85% 55% / 0.05)', color: 'hsl(265 10% 85%)' }}>
+                              <X className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'hsl(5 85% 55%)' }} />
                               {item}
                             </li>
                           ))}
@@ -425,14 +470,14 @@ export default function ResumeAnalysisPage() {
                     {/* TO REPHRASE */}
                     {analysis.feedback.to_rephrase && analysis.feedback.to_rephrase.length > 0 && (
                       <div>
-                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.78 0.18 72)' }}>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'hsl(72 100% 45%)' }}>
                           Better Phrasing
                         </p>
                         <ul className="space-y-2">
                           {analysis.feedback.to_rephrase.map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5 border border-yellow-500/10"
-                              style={{ background: 'oklch(0.78 0.18 72 / 0.05)', color: 'oklch(0.70 0.015 265)' }}>
-                              <TrendingUp className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'oklch(0.78 0.18 72)' }} />
+                              style={{ background: 'hsl(72 100% 45% / 0.05)', color: 'hsl(265 10% 85%)' }}>
+                              <TrendingUp className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'hsl(72 100% 45%)' }} />
                               {item}
                             </li>
                           ))}
@@ -443,14 +488,14 @@ export default function ResumeAnalysisPage() {
                     {/* TO ADD */}
                     {analysis.feedback.to_add && analysis.feedback.to_add.length > 0 && (
                       <div>
-                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.72 0.18 195)' }}>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'hsl(188 100% 42%)' }}>
                           Consider Adding
                         </p>
                         <ul className="space-y-2">
                           {analysis.feedback.to_add.map((item, i) => (
                             <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5 border border-cyan-500/10"
-                              style={{ background: 'oklch(0.72 0.18 195 / 0.05)', color: 'oklch(0.70 0.015 265)' }}>
-                              <CheckCircle2 className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'oklch(0.72 0.18 195)' }} />
+                              style={{ background: 'hsl(188 100% 42% / 0.05)', color: 'hsl(265 10% 85%)' }}>
+                              <CheckCircle2 className="shrink-0 w-3.5 h-3.5 mt-0.5" style={{ color: 'hsl(188 100% 42%)' }} />
                               {item}
                             </li>
                           ))}
@@ -461,7 +506,7 @@ export default function ResumeAnalysisPage() {
                     {/* TO LEARN */}
                     {analysis.feedback.to_learn && analysis.feedback.to_learn.length > 0 && (
                       <div>
-                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'oklch(0.75 0.18 152)' }}>
+                        <p className="text-[10px] font-mono tracking-widest uppercase mb-3" style={{ color: 'hsl(152 100% 45%)' }}>
                           Skills to Learn
                         </p>
                         <div className="flex flex-wrap gap-2">
@@ -469,9 +514,9 @@ export default function ResumeAnalysisPage() {
                             <span key={i}
                               className="text-[11px] px-2.5 py-1 rounded-full font-medium border"
                               style={{
-                                background: 'oklch(0.75 0.18 152 / 0.08)',
-                                color: 'oklch(0.75 0.18 152)',
-                                borderColor: 'oklch(0.75 0.18 152 / 0.2)',
+                                background: 'hsl(152 100% 45% / 0.08)',
+                                color: 'hsl(152 100% 45%)',
+                                borderColor: 'hsl(152 100% 45% / 0.2)',
                               }}>
                               {skill}
                             </span>
@@ -485,9 +530,9 @@ export default function ResumeAnalysisPage() {
                       <ul className="space-y-2">
                         {analysis.feedback.general_improvements.map((item, i) => (
                           <li key={i} className="flex items-start gap-2.5 text-xs rounded-lg px-3 py-2.5"
-                            style={{ background: 'oklch(0.16 0.010 265)', color: 'oklch(0.70 0.015 265)' }}>
+                            style={{ background: 'hsl(265 15% 15%)', color: 'hsl(265 10% 85%)' }}>
                             <span className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold mt-0.5"
-                              style={{ background: 'oklch(0.78 0.18 72 / 0.15)', color: 'oklch(0.78 0.18 72)' }}>
+                              style={{ background: 'hsl(72 100% 70% / 0.15)', color: 'hsl(72 100% 70%)' }}>
                               {i + 1}
                             </span>
                             {item}

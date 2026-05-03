@@ -19,7 +19,7 @@ export default function RegisterPage() {
 
   const passwordStrength = password.length === 0 ? 0 : password.length < 6 ? 1 : password.length < 10 ? 2 : 3;
   const strengthLabel = ["", "Weak", "Fair", "Strong"][passwordStrength];
-  const strengthColor = ["", "bg-red-500", "bg-amber-400", "bg-cyan-400"][passwordStrength];
+  const strengthColor = ["", "bg-red-500", "bg-amber-400", "bg-[hsl(188,100%,42%)]"][passwordStrength];
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +100,7 @@ export default function RegisterPage() {
         <div className="space-y-2 pt-1">
           {["AI-powered ATS scoring", "Detailed feedback & suggestions", "Resume content editor"].map((benefit) => (
             <div key={benefit} className="flex items-center gap-2 text-white/40 text-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 text-cyan-500/70 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[hsl(188,100%,42%)]/70 shrink-0" />
               {benefit}
             </div>
           ))}
@@ -110,7 +110,7 @@ export default function RegisterPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold rounded-xl transition-all duration-200 glow-teal group"
+            className="w-full h-12 bg-[hsl(188,100%,42%)] hover:bg-[hsl(188,100%,48%)] text-[hsl(265,25%,4%)] font-bold rounded-xl transition-all duration-200 glow-teal group"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -127,7 +127,7 @@ export default function RegisterPage() {
       <div className="mt-6 pt-6 border-t border-white/8 text-center">
         <p className="text-sm text-white/30">
           Already have an account?{" "}
-          <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+          <Link href="/auth/login" className="text-[hsl(188,100%,42%)] hover:text-[hsl(188,100%,48%)] font-medium transition-colors">
             Sign in →
           </Link>
         </p>

@@ -94,7 +94,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold rounded-xl transition-all duration-200 glow-teal group"
+            className="w-full h-12 bg-[hsl(188,100%,42%)] hover:bg-[hsl(188,100%,48%)] text-[hsl(265,25%,4%)] font-bold rounded-xl transition-all duration-200 glow-teal group"
           >
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -111,7 +111,7 @@ export default function LoginPage() {
       <div className="mt-6 pt-6 border-t border-white/8 text-center">
         <p className="text-sm text-white/30">
           New here?{" "}
-          <Link href="/auth/register" className="text-cyan-400 hover:text-cyan-300 font-medium transition-colors">
+          <Link href="/auth/register" className="text-[hsl(188,100%,42%)] hover:text-[hsl(188,100%,48%)] font-medium transition-colors">
             Create an account →
           </Link>
         </p>
